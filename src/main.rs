@@ -13,16 +13,18 @@ fn main() {
     let filename = String::from("sample-input.png");
 
     // Load the image
-    let mut img = load_image_rgb(&filename);
+    let img = load_image_rgb(&filename);
     let (img_h, img_w) = (img.height() as usize, img.width() as usize);
-    img.put_pixel(0, 0, Rgb([255, 255, 255]));
 
     println!("Loaded image has resolution {} x {}", img_h, img_w);
 
     let img_res = rubbersheet(img, img_h, img_w, amp, sigma);
 
     // Write to disk
-    img_res.save("out.png").expect("Failed to save image");
+    let outpath = String::from("out.png");
+    img_res.save(&outpath).expect("Failed to save image");
+
+    println!("Output written to {outpath}");
 }
 
 fn rubbersheet(img: RgbImage, h: usize, w: usize, amp: f32, sigma: f32) -> RgbImage {
@@ -82,6 +84,8 @@ fn compute_displacement_field(d_x: &mut Array2<f32>, d_y: &mut Array2<f32>, h: u
     let kws_i = kws as i32;
     for i in 0..h {
         for j in 0..w {
+            sum_x = 0.0;
+            sum_y = 0.0;
             for k in -kws_i..kws_i+1 {
                 let mut v = j as i32 + k;
                 if v < 0 { v = -v; }
@@ -148,7 +152,7 @@ fn apply_displacement_field(input: &RgbImage, output: &mut RgbImage, h: usize, w
             for idx in 0..4 {
                 let (mut u, mut v, f) = match idx {
                     0 => (u0, v0, (1.0 - f1) * (1.0 - f2)),
-                    1 => (u0 + 1, v0, f1 * (1.0 - f1)),
+                    1 => (u0 + 1, v0, f1 * (1.0 - f2)),
                     2 => (u0, v0 + 1, (1.0 - f1) * f2),
                     _ => (u0 + 1, v0 + 1, f1 * f2),
                 };
