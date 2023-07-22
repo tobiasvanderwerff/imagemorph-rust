@@ -1,16 +1,24 @@
 use std::ops::{Div, Mul};
+// use std::path::Path
 use rand::Rng;
 use image::io::Reader as ImageReader;
 use image::{Rgb, RgbImage};
 use ndarray::Array2;
+// use clap::Parser;
+use std::env;
 
 
 fn main() {
     // Process command line arguments
-    // TODO
-    let amp = 2.5;
-    let sigma = 9.0;
-    let filename = String::from("sample-input.png");
+    let args: Vec<String> = env::args().collect(); 
+
+    if args.contains(&String::from("-h")) { println!("Usage: {} [FILENAME] [AMP] [SIGMA]", args[0]); return; }
+
+    let filename: String = if args.len() > 1 { String::from(&args[1]) } else { String::from("sample-input.png") };
+    let amp: f32 = if args.len() > 2 { args[2].parse().expect("Failed to parse 'amp'") } else { 2.5 };
+    let sigma: f32 = if args.len() > 3 { args[3].parse().expect("Failed to parse 'sigma'") } else { 9.0 };
+    
+    println!("Args:\n\tfilename = {filename}\n\tamp = {amp}\n\tsigma = {sigma}");
 
     // Load the image
     let img = load_image_rgb(&filename);
